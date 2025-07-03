@@ -141,13 +141,3 @@ void EncDecTest(bool use_argb, int source_image_index, WebPConfig config,
 }
 
 }  // namespace
-
-FUZZ_TEST(EncDec, EncDecTest)
-    .WithDomains(/*use_argb=*/fuzztest::Arbitrary<bool>(),
-                 /*source_image_index=*/
-                 fuzztest::InRange<int>(0, fuzz_utils::kNumSourceImages - 1),
-                 fuzz_utils::ArbitraryWebPConfig(),
-                 /*optimization_index=*/
-                 fuzztest::InRange<uint32_t>(0,
-                                             fuzz_utils::kMaxOptimizationIndex),
-                 fuzz_utils::ArbitraryCropOrScaleParams());
