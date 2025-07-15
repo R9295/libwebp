@@ -17,19 +17,29 @@ static uint8_t FuzzHash(const uint8_t* const data, size_t size) {
   for (size_t i = 0; i < size; i += incr) value += data[i];
   return value;
 }
+template<typename Container>
+auto pop(Container& container) -> typename Container::value_type {
+    auto value = std::move(container.back());  // or .top() for stack
+    container.pop_back();  // or .pop() for stack/queue
+    return value;
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *d, size_t s) {
   std::vector<unsigned char> blob(d, d + s);
+  if (blob.size() < 20) {
+    return 0;
+  }
   WebPDecoderConfig config;
-  auto use_threads = false;
-  auto use_dithering = true;
-  auto use_cropping = true;
-  auto use_scaling = true;
-  auto no_fancy_upsampling = false;
-  auto factor_u8 = true;
-  auto flip = true;
-  auto bypass_filtering = true;
-  auto colorspace = true;
-  auto incremental = true;
+  bool use_threads = false;
+  bool use_dithering = static_cast<bool>(pop(blob));
+  bool use_cropping = static_cast<bool>(pop(blob));
+  bool use_scaling = static_cast<bool>(pop(blob));
+  bool no_fancy_upsampling = static_cast<bool>(pop(blob));
+  bool factor_u8 = static_cast<bool>(pop(blob));
+  bool flip = static_cast<bool>(pop(blob));
+  bool bypass_filtering = static_cast<bool>(pop(blob));
+  bool colorspace = static_cast<bool>(pop(blob));
+  bool incremental = static_cast<bool>(pop(blob));
 
   if (!WebPInitDecoderConfig(&config)) return 0;
   const uint8_t* const data = reinterpret_cast<const uint8_t*>(blob.data());
